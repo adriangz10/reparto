@@ -1,7 +1,7 @@
 # 💧 Reparto — Sistema de Control de Carga, Ventas y Arqueo de Caja
 
 > **Solución de escritorio moderna, robusta y eficiente para la administración de reparto de agua y soda.**  
-> Desarrollado a medida por **Apolo Studio** con **Go**, **Wails v2** y motor de base de datos **SQLite**.
+> Desarrollado a medida por **Adriangz10** con **Go**, **Wails v2** y motor de base de datos **SQLite**.
 
 ---
 
