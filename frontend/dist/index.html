@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reparto — Carga, Ventas y Arqueo</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="noprint">
+    <div class="header-content">
+      <h1>Control de Carga, Ventas y Arqueo</h1>
+      <div class="bar">
+        <!-- Selector con calendario visual -->
+        <div class="cal-wrapper">
+          <button type="button" id="btnCalToggle" class="cal-toggle-btn" title="Abrir calendario de cierres">
+            📅 <span id="fechaTexto">--/--/----</span> <span class="arrow-down">▾</span>
+          </button>
+          <input type="hidden" id="fecha" />
+
+          <!-- Popover desplegable del calendario -->
+          <div id="calPopover" class="cal-popover" style="display: none;">
+            <div class="cal-header">
+              <button type="button" id="calPrev" class="cal-nav-btn" title="Mes anterior">&larr;</button>
+              <span id="calTituloMes" class="cal-month-title">Mes Año</span>
+              <button type="button" id="calNext" class="cal-nav-btn" title="Mes siguiente">&rarr;</button>
+            </div>
+            <div class="cal-weekdays">
+              <span>Lu</span><span>Ma</span><span>Mi</span><span>Ju</span><span>Vi</span><span>Sá</span><span>Do</span>
+            </div>
+            <div id="calGrid" class="cal-grid"></div>
+            <div class="cal-footer">
+              <div class="cal-legend">
+                <span class="legend-dot saved"></span> Cierre guardado
+                <span class="legend-dot empty"></span> Sin cierre
+              </div>
+              <button type="button" id="calBtnHoy" class="cal-btn-hoy">Hoy</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Menú desplegable de Historial (máximo 7 items con scroll) -->
+        <div class="dropdown-wrapper" id="historialWrapper">
+          <button type="button" id="btnHistorialToggle" class="sec dropdown-toggle-btn" title="Jornadas guardadas">
+            <span id="historialLabel">Historial…</span> <span class="arrow-down">▾</span>
+          </button>
+          <div id="historialDropdown" class="dropdown-menu" style="display: none;">
+            <div id="historialItems" class="dropdown-items-list"></div>
+          </div>
+        </div>
+        <button type="button" id="btnGuardar">Guardar</button>
+        <button type="button" id="btnNueva" class="sec">Nueva jornada</button>
+        <button type="button" id="btnImprimir" class="sec">Imprimir / PDF</button>
+        <button type="button" id="btnTheme" class="sec icon-btn" title="Cambiar Tema">🌙</button>
+        <span id="msg"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="noprint">
+    <section class="card">
+      <h2>1. Precios</h2>
+      <div class="grid3" id="precios"></div>
+      <p class="hint">1 cajón = 6 unidades = <b id="cajon">$12.000</b></p>
+    </section>
+
+    <section class="card">
+      <h2>2. Carga y ventas</h2>
+      <div class="table-container">
+        <table id="tablaCarga">
+          <thead><tr><th>Producto</th><th>Carga inicial</th><th>Devuelto / sobrante</th><th>Vendido</th><th>Total</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><td colspan="4">Total vendido</td><td id="totalVendido">$0</td></tr></tfoot>
+        </table>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>3. Rendición financiera</h2>
+      <div class="grid3">
+        <label>Transferencias recibidas<input type="number" min="0" step="any" id="transferencias" placeholder="0.00" /></label>
+        <label>Fiados / clientes debiendo<input type="number" min="0" step="any" id="fiados" placeholder="0.00" /></label>
+        <label>Gastos del día<input type="number" min="0" step="any" id="gastos" placeholder="0.00" /></label>
+      </div>
+      <div class="grid3 kpis">
+        <div class="kpi"><span>Efectivo teórico</span><b id="teorico">$0</b></div>
+        <div class="kpi"><span>Parte A (50%)</span><b id="parteA">$0</b></div>
+        <div class="kpi"><span>Parte B (50%)</span><b id="parteB">$0</b></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>4. Arqueo de caja</h2>
+      <div class="table-container">
+        <table id="tablaBilletes">
+          <thead><tr><th>Billete</th><th>Cantidad</th><th>Subtotal</th></tr></thead>
+          <tbody></tbody>
+          <tfoot><tr><td colspan="2">Efectivo real contado</td><td id="real">$0</td></tr></tfoot>
+        </table>
+      </div>
+      <div id="diferencia" class="diff exacta">✔ Caja exacta</div>
+    </section>
+
+    <!-- 5. Estadísticas Diario, Semanal y Mensual -->
+    <section class="card stats-card">
+      <div class="stats-header">
+        <h2>5. Estadísticas de Cierre</h2>
+        <span id="statsSubtitulo" class="stats-subtitulo"></span>
+      </div>
+      <div class="stats-grid">
+        <!-- Cierre Diario -->
+        <div class="stat-card">
+          <div class="stat-badge">📅 Cierre Diario</div>
+          <div class="stat-period" id="statDiaPeriodo">-</div>
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span>Ganado:</span>
+              <b id="statDiaGanado" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row">
+              <span>Gastos:</span>
+              <b id="statDiaGastos" class="stat-val stat-gastos">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte A:</span>
+              <b id="statDiaParteA" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte B:</span>
+              <b id="statDiaParteB" class="stat-val">$0</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cierre Semanal -->
+        <div class="stat-card">
+          <div class="stat-badge">📆 Cierre Semanal</div>
+          <div class="stat-period" id="statSemanaPeriodo">-</div>
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span>Ganado:</span>
+              <b id="statSemanaGanado" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row">
+              <span>Gastos:</span>
+              <b id="statSemanaGastos" class="stat-val stat-gastos">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte A:</span>
+              <b id="statSemanaParteA" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte B:</span>
+              <b id="statSemanaParteB" class="stat-val">$0</b>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cierre Mensual -->
+        <div class="stat-card">
+          <div class="stat-badge">🗓️ Cierre Mensual</div>
+          <div class="stat-period" id="statMesPeriodo">-</div>
+          <div class="stat-rows">
+            <div class="stat-row">
+              <span>Ganado:</span>
+              <b id="statMesGanado" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row">
+              <span>Gastos:</span>
+              <b id="statMesGastos" class="stat-val stat-gastos">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte A:</span>
+              <b id="statMesParteA" class="stat-val">$0</b>
+            </div>
+            <div class="stat-row split">
+              <span>Parte B:</span>
+              <b id="statMesParteB" class="stat-val">$0</b>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <section id="resumen"></section>
+
+  <script src="app.js"></script>
+</body>
+</html>
