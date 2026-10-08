@@ -150,6 +150,6 @@ El ejecutable optimizado sin ventana de consola se generará automáticamente en
 
 ## 🤝 Soporte y Créditos
 
-Este software fue diseñado y desarrollado con altos estándares de calidad por **Apolo Studio**.
+Este software fue diseñado y desarrollado con altos estándares de calidad por **Adriangz10**.
 
 Para asistencia técnica, solicitudes de soporte o personalizaciones, comunicate con el equipo de soporte.
