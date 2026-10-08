@@ -50,6 +50,14 @@ func NewSQLiteJornadaRepository(baseDir string) (*SQLiteJornadaRepository, error
 }
 
 func (r *SQLiteJornadaRepository) initDB() error {
+	pragmas := `
+	PRAGMA journal_mode = WAL;
+	PRAGMA synchronous = NORMAL;
+	PRAGMA busy_timeout = 5000;
+	PRAGMA foreign_keys = ON;
+	`
+	_, _ = r.db.Exec(pragmas)
+
 	query := `
 	CREATE TABLE IF NOT EXISTS jornadas (
 		fecha TEXT PRIMARY KEY,

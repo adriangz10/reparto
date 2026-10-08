@@ -4,5 +4,12 @@
   "outputfilename": "reparto",
   "frontend:install": "",
   "frontend:build": "",
-  "author": { "name": "Apolo Studio" }
+  "author": { "name": "Apolo Studio" },
+  "info": {
+    "companyName": "Apolo Studio",
+    "productName": "Reparto - Control de Carga y Caja",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright 2026 Apolo Studio",
+    "comments": "Sistema de gestión de carga, ventas y arqueo de caja con SQLite"
+  }
 }
